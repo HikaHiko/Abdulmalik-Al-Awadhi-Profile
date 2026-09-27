@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abdulmalek | Cinematic Portfolio</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;800&family=Oswald:wght@500;600;700&family=Tajawal:wght@400;500;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <header class="navbar">
+        <div class="logo">
+            <h1>ABDULMALEK</h1>
+            <span class="logo-sub" id="i18n-logo-sub">PROFESSIONAL VIDEO EDITOR</span>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="video-search-input" placeholder="Search videos..." autocomplete="off">
+            <i class="fas fa-search" id="search-submit-icon" style="cursor:pointer;"></i>
+            <div id="search-results-dropdown" class="search-results-dropdown hidden"></div>
+        </div>
+        <div class="nav-right">
+            <button class="lang-toggle" id="lang-toggle-btn">EN / ع</button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h2 class="cinematic-title" id="i18n-hero-title">ABDULMALEK<br>ALAWADHI</h2>
+            <p class="subtitle-red" id="i18n-hero-subtitle">PROFESSIONAL VIDEO EDITOR</p>
+            <a href="#portfolio" class="btn-primary" id="i18n-hero-btn"><i class="fas fa-play"></i> VIEW PORTFOLIO</a>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="portfolio-section">
+        <div class="section-header">
+            <h3 id="i18n-all-works">ALL WORKS</h3>
+            <div class="divider"></div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters" id="category-filters">
+            <button class="filter-btn active" data-category="ALL">ALL</button>
+            <button class="filter-btn" data-category="Reels">Reels</button>
+            <button class="filter-btn" data-category="Events">Events</button>
+            <button class="filter-btn" data-category="Short Films">Short Films</button>
+            <button class="filter-btn" data-category="Ads">Ads</button>
+            <button class="filter-btn" data-category="Interviews">Interviews</button>
+            <button class="filter-btn" data-category="BTS">BTS</button>
+            <button class="filter-btn" data-category="Podcast">Podcast</button>
+            <button class="filter-btn" data-category="Brand Films">Brand Films</button>
+            <button class="filter-btn" data-category="Music Videos">Music Videos</button>
+            <button class="filter-btn" data-category="Documentaries">Documentaries</button>
+            <button class="filter-btn" data-category="Social Media">Social Media</button>
+            <button class="filter-btn" data-category="Commercial">Commercial</button>
+            <button class="filter-btn" data-category="Promo">Promo</button>
+            <button class="filter-btn" data-category="Recap">Recap</button>
+        </div>
+
+        <!-- Video Grid -->
+        <div class="video-grid" id="video-grid">
+            <!-- Videos will be injected here via JS -->
+            <div class="loading" id="i18n-loading">Loading cinematic works...</div>
+        </div>
+    </section>
+
+    <!-- Subscribe Section -->
+    <section class="subscribe-section" id="subscribe">
+        <div class="subscribe-container">
+            <h2 class="subscribe-title" id="i18n-sub-title">STAY UPDATED</h2>
+            <p class="subscribe-subtitle" id="i18n-sub-subtitle">Get notified about latest projects & behind-the-scenes content</p>
+
+            <form id="subscribe-form" class="subscribe-form">
+                <div class="subscribe-input-group">
+                    <input type="email" id="subscribe-email" placeholder="your@email.com"
+                        required autocomplete="email">
+                    <button type="submit" id="subscribe-btn" class="btn-subscribe">SUBSCRIBE</button>
+                </div>
+                <div id="subscribe-msg" class="subscribe-msg hidden"></div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <h2>ABDULMALEK</h2>
+            <p id="i18n-footer-desc">نصنع من المشاهد قصة سينمائية تلهم العالم.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-whatsapp"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+            <p class="copyright" id="i18n-footer-copy">&copy; 2026 عبد الملك العواضي. جميع الحقوق محفوظة.</p>
+            <div class="footer-admin">
+                <a href="/admin" target="_blank" class="admin-footer-btn" id="i18n-admin-btn"><i
+                        class="fas fa-lock"></i> لوحة التحكم</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Video Modal -->
+    <div id="video-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" id="close-modal-btn" aria-label="Close">&times;</button>
+            <div class="iframe-container" id="iframe-container">
+                <!-- Iframe injected via JS -->
+            </div>
+            <div class="modal-info">
+                <div class="modal-badges-row" id="modal-badges-row">
+                    <span class="modal-badge cat-badge" id="modal-cat-badge">WORK</span>
+                    <span class="modal-badge views-badge" id="modal-views-badge"><i class="fas fa-eye"></i> 0</span>
+                    <span class="modal-badge channel-badge hidden" id="modal-channel-badge"><i class="fas fa-tv"></i>
+                        <span id="modal-channel-name"></span></span>
+                </div>
+                <h3 id="modal-title" class="modal-video-title">Video Title</h3>
+
+                <div class="modal-desc-box">
+                    <div class="desc-box-header" id="i18n-desc-header">
+                        <i class="fas fa-align-left"></i> <span>تفاصيل الوصف · Description</span>
+                    </div>
+                    <div id="modal-desc" class="modal-desc-text"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Script -->
+    <script src="app.js"></script>
+</body>
+
+</html>
