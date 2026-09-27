@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allVideos = [];
     let activeCategory = 'ALL';
     let searchQuery = '';
-    let currentLang = localStorage.getItem('portfolio_lang') || 'ar';
+    let currentLang = localStorage.getItem('portfolio_lang') || 'en';
 
     // ── Translation Dictionary
     const i18n = {
