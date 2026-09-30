@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allVideos = [];
     let activeCategory = 'ALL';
     let searchQuery = '';
-    let currentLang = localStorage.getItem('portfolio_lang') || 'en';
+    let currentLang = localStorage.getItem('portfolio_lang_v2') || 'en';
 
     // ── Translation Dictionary
     const i18n = {
@@ -100,9 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Apply Language Translation
     function applyLanguage(lang) {
         currentLang = lang;
-        localStorage.setItem('portfolio_lang', lang);
+        localStorage.setItem('portfolio_lang_v2', lang);
 
-        const t = i18n[lang] || i18n.ar;
+        const t = i18n[lang] || i18n.en;
 
         // HTML attributes
         document.documentElement.setAttribute('lang', lang);
@@ -138,6 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (elFooterCopy) elFooterCopy.textContent = t.footerCopy;
         if (elAdminBtn)   elAdminBtn.innerHTML = t.adminBtn;
         if (searchInput)  searchInput.setAttribute('placeholder', t.searchPlaceholder);
+        const elDescSpan = document.querySelector('#i18n-desc-header span');
+        if (elDescSpan)   elDescSpan.textContent = (lang === 'ar') ? 'تفاصيل الوصف' : 'Description';
 
         // Re-render categories & videos with translated category names
         buildCategoryButtons();
@@ -229,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderVideos();
         } catch (error) {
             console.error('Error fetching videos:', error);
-            const t = i18n[currentLang] || i18n.ar;
+            const t = i18n[currentLang] || i18n.en;
             videoGrid.innerHTML = `<div class="loading">${t.loading}</div>`;
         }
     }
@@ -349,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return matchesCat && matchesSearch;
         });
 
-        const t = i18n[currentLang] || i18n.ar;
+        const t = i18n[currentLang] || i18n.en;
 
         if (filtered.length === 0) {
             videoGrid.innerHTML = `
@@ -687,7 +689,7 @@ document.addEventListener('DOMContentLoaded', () => {
                    enCatNorm.includes(normQuery);
         });
 
-        const t = i18n[currentLang] || i18n.ar;
+        const t = i18n[currentLang] || i18n.en;
 
         if (matches.length === 0) {
             searchDropdown.innerHTML = `<div class="search-result-empty">${t.noResults}</div>`;
@@ -784,7 +786,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         subscribeBtn.disabled = true;
         const originalText = subscribeBtn.textContent;
-        const t = i18n[currentLang] || i18n.ar;
+        const t = i18n[currentLang] || i18n.en;
 
         subscribeBtn.textContent = t.subscribing;
         subscribeMsg.className = 'subscribe-msg hidden';
