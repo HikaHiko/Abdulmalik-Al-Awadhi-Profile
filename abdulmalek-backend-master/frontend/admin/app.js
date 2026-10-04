@@ -899,7 +899,8 @@ function renderVideosGrid(videos) {
     const cat = v.category || 'WORK';
 
     return `
-      <div class="video-card">
+      <div class="video-card${v.isPinned ? ' is-pinned' : ''}">
+        ${v.isPinned ? '<span class="pin-badge">📌 مثبّت · Pinned</span>' : ''}
         <img src="${escapeHtml(thumb)}" alt="${escapeHtml(v.title || '')}" class="video-thumbnail" loading="lazy" />
         <div class="video-info">
           <div>
@@ -912,6 +913,9 @@ function renderVideosGrid(videos) {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
               </a>` : '<span></span>'}
             <div style="display:flex; gap:6px;">
+              <button class="action-btn pin-btn${v.isPinned ? ' pinned' : ''}" onclick="togglePinVideo('${v._id}')" title="${v.isPinned ? 'إلغاء التثبيت · Unpin' : 'تثبيت في الأعلى · Pin to top'}" aria-pressed="${v.isPinned ? 'true' : 'false'}" style="padding:4px 8px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
+              </button>
               <button class="action-btn" onclick="openEditModal('${v._id}')" title="تعديل · Edit" style="padding:4px 8px;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
               </button>
@@ -971,6 +975,7 @@ function renderVideosTable(videos = null) {
             <div class="video-info">
               <div class="video-title" title="${escapeHtml(v.title || '')}">
                 ${escapeHtml(v.title || 'بدون عنوان')}
+                ${v.isPinned ? '<span class="pin-badge pin-badge-inline">📌 مثبّت</span>' : ''}
                 ${v.compressing ? '<span style="background: rgba(241,196,15,0.2); color: #f39c12; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-right: 6px;">⏳ جاري الضغط...</span>' : ''}
                 ${v.compressionFailed ? '<span style="background: rgba(231,76,60,0.2); color: #e74c3c; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-right: 6px;">⚠️ فشل الضغط</span>' : ''}
               </div>
@@ -992,6 +997,9 @@ function renderVideosTable(videos = null) {
               <a href="${escapeHtml(v.videoUrl)}" target="_blank" class="action-btn" title="مشاهدة · Watch">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
               </a>` : ''}
+            <button class="action-btn pin-btn${v.isPinned ? ' pinned' : ''}" onclick="togglePinVideo('${v._id}')" title="${v.isPinned ? 'إلغاء التثبيت · Unpin' : 'تثبيت في الأعلى · Pin to top'}" aria-pressed="${v.isPinned ? 'true' : 'false'}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
+            </button>
             <button class="action-btn" onclick="openEditModal('${v._id}')" title="تعديل · Edit">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
@@ -1736,6 +1744,32 @@ document.getElementById('delete-modal')?.addEventListener('click', (e) => {
     document.getElementById('delete-modal').classList.add('hidden');
   }
 });
+
+// ── Pin / Unpin video (المثبّت يظهر أولاً في الواجهة الرئيسية)
+const pinInFlight = new Set();
+async function togglePinVideo(videoId) {
+  if (pinInFlight.has(videoId)) return; // امنع الضغط المزدوج
+  const video = (allVideos || []).find(v => v._id === videoId);
+  if (!video) return;
+
+  const newState = !video.isPinned;
+  pinInFlight.add(videoId);
+  try {
+    const res = await apiPut(`/videos/${videoId}/pin`, { isPinned: newState });
+    if (!res || !res.success) throw new Error((res && res.error) || 'فشل التثبيت');
+    showToast(
+      newState ? '📌 تم تثبيت الفيديو · Video pinned' : '✅ تم إلغاء التثبيت · Video unpinned',
+      'success'
+    );
+    await loadAllData();   // يعيد الترتيب القادم من السيرفر (المثبّت أولاً)
+    renderVideosTable();
+  } catch (err) {
+    showToast('❌ ' + (err.message || 'فشل التثبيت'), 'error');
+  } finally {
+    pinInFlight.delete(videoId);
+  }
+}
+window.togglePinVideo = togglePinVideo;
 
 document.getElementById('confirm-delete-btn')?.addEventListener('click', async () => {
   const id = document.getElementById('delete-video-id').value;
