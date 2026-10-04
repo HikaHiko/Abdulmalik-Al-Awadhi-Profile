@@ -15,7 +15,17 @@ const getVideos = async (req, res) => {
     if (category && category !== 'all') filter.category = category;
     if (search) filter.title = { $regex: search, $options: 'i' };
 
-    const videos = await Video.find(filter).sort({ createdAt: -1 });
+    const allFound = await Video.find(filter).sort({ createdAt: -1 });
+
+    // المثبّتة أولاً (الأحدث تثبيتاً في الأعلى)، ثم باقي الفيديوهات من الأحدث للأقدم.
+    // الفرز هنا في JS (وليس في Mongo) حتى تعمل الفيديوهات القديمة التي لا تحتوي
+    // على الحقل isPinned بدون الحاجة لأي migration — Mongoose يعطيها false تلقائياً.
+    const pinned = allFound
+      .filter(v => v.isPinned)
+      .sort((a, b) => new Date(b.pinnedAt || 0) - new Date(a.pinnedAt || 0));
+    const rest = allFound.filter(v => !v.isPinned);
+    const videos = [...pinned, ...rest];
+
     res.json({ success: true, data: videos, count: videos.length });
   } catch (err) {
     res.status(500).json({ error: 'خطأ في جلب الفيديوهات', details: err.message });
@@ -330,6 +340,32 @@ const updateVideoCategory = async (req, res) => {
   }
 };
 
+// PUT /api/videos/:id/pin — تثبيت / إلغاء تثبيت فيديو
+// body: { isPinned: true|false }  (لو لم يُرسل، يتم عكس الحالة الحالية)
+const setVideoPin = async (req, res) => {
+  try {
+    const existing = await Video.findById(req.params.id, 'isPinned');
+    if (!existing) return res.status(404).json({ error: 'الفيديو غير موجود' });
+
+    const { isPinned } = req.body || {};
+    const pin = (typeof isPinned === 'boolean') ? isPinned : !existing.isPinned;
+
+    const video = await Video.findByIdAndUpdate(
+      req.params.id,
+      { isPinned: pin, pinnedAt: pin ? new Date() : null },
+      { new: true }
+    );
+
+    res.json({
+      success: true,
+      data: video,
+      message: pin ? '📌 تم تثبيت الفيديو' : '✓ تم إلغاء التثبيت'
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'خطأ في تثبيت الفيديو', details: err.message });
+  }
+};
+
 // GET /api/videos/:id/compression-status — تحقق من حالة ضغط الفيديو
 const getCompressionStatus = async (req, res) => {
   try {
@@ -354,5 +390,5 @@ const getCompressionStatus = async (req, res) => {
 module.exports = {
   getVideos, getVideo, addVideo, uploadVideo, fetchVideoMetadata,
   updateVideo, deleteVideo, incrementView, updateVideoCategory,
-  getCompressionStatus
+  setVideoPin, getCompressionStatus
 };

@@ -16,6 +16,8 @@ const videoSchema = new mongoose.Schema({
   views:            { type: Number,  default: 0 },
   compressing:      { type: Boolean, default: false }, // true بينما الضغط جاري
   compressionFailed:{ type: Boolean, default: false }, // true لو فشل الضغط
+  isPinned:         { type: Boolean, default: false }, // true = مثبّت في أعلى الصفحة
+  pinnedAt:         { type: Date,    default: null  }, // وقت التثبيت (آخر فيديو مثبّت يظهر أولاً)
   createdAt:        { type: Date,    default: Date.now }
 });
 

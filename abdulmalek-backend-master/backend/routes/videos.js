@@ -9,7 +9,7 @@ const upload   = require('../middleware/upload');
 const {
   getVideos, getVideo, addVideo, uploadVideo, fetchVideoMetadata,
   updateVideo, deleteVideo, incrementView,
-  updateVideoCategory, getCompressionStatus
+  updateVideoCategory, setVideoPin, getCompressionStatus
 } = require('../controllers/videos');
 
 // Public
@@ -28,6 +28,9 @@ router.post('/upload/file',  adminAuth, upload.single('video'), uploadVideo); //
 
 // Admin — تحديث التصنيف فقط
 router.put('/:id/category',            adminAuth, updateVideoCategory);      // PUT    /api/videos/:id/category
+
+// Admin — تثبيت / إلغاء تثبيت فيديو (يظهر أولاً في الواجهة)
+router.put('/:id/pin',                 adminAuth, setVideoPin);              // PUT    /api/videos/:id/pin
 
 // Public — حالة ضغط الفيديو
 router.get('/:id/compression-status',  getCompressionStatus);               // GET    /api/videos/:id/compression-status
